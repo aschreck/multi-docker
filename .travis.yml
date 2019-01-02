@@ -1,0 +1,25 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t aaronschreck/react-test -f ./client/dev/Dockerfile ./client
+
+script:
+# this runs your script and then fails if the process runs any status code other than zero.
+  - docker run aaronschreck/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t aaronschreck/multi-client ./client
+  - docker build -t aaronschreck/multi-nginx ./nginx
+  - docker build -t aaronschreck/multi-worker ./worker
+  - docker build -t aaronschreck/multi-api ./api
+
+  # Log in to the docker CLI
+  -echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  #take the images and push them to dockerhub.
+
+  - docker push aaron_schreck/multi-client
+  - docker push aaron_schreck/multi-nginx
+  - docker push aaron_schreck/multi-worker
+  - docker push aaron_schreck/multi-api
