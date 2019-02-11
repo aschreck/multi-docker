@@ -15,3 +15,9 @@ spec:
       containers:
         - name: worker
           image: aaronschreck/multi-worker
+          env:
+          # these initialize the pod/container with the following env variables:
+            - name: REDIS_HOST
+              value: redis-cluster-ip-service
+            - name: REDIS_PORT
+              value: 6379
