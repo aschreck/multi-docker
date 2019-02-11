@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: postgres
+      # the template is the template used for every pod that is created from this yaml.
+  template:
+    metadata:
+      labels:
+        component: postgres
+    spec:
+      volumes:
+        # this tells K8s to look at a volume claim with matching metadata.
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: database-persistent-volume-claim
+      containers:
+        - name: postgres
+          image: postgres
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            # This tells the pod created by the deployment to use the above designated volume.
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+              subPath: postgres
